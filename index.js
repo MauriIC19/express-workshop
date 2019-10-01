@@ -1,12 +1,15 @@
 const express = require('express');
 const app = express();
+const pokedex = require('./pokedex.json').pokemon;
 
-// Handle requests to http://127.0.0.1:3000/
 app.get("/", (req, res) => {
-    res.send("Hola mundo");
+    res.send("¡Bienvenido al Pokédex!");
 });
 
-// Run server
+app.get("/pokemon", (req, res) => {
+    res.json(pokedex);
+});
+
 app.listen(3000, () => {
     console.log("Server is running...");
 });

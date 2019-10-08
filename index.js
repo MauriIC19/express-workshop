@@ -1,49 +1,29 @@
 const bodyParser = require('body-parser');
-const pokedex = require('./pokedex.json').pokemon;
 const express = require('express');
+const morgan = require('morgan');
+const pokemon = require('./routes/pokemon');
+const notFoundHandler = require('./middleware/notFoundHandler');
 const app = express();
 
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-    res.send("Bienvenido a mi Pokédex");
-});
-
-app.get("/pokemon", (req, res) => {
-    res.status(200).json(pokedex);
-});
-
-app.post("/pokemon", (req, res) => {
-    res.json(req.body.x);
-});
-
-app.get("/pokemon/image/:id", (req, res) => {
-    const img = pokedex[req.params.id - 1].img;
-    res.send("<img src='" + img + "'>");
-})
-
-app.get("/pokemon/\\brandom\\b", (req, res) => {
-    const pokemon = pokedex[Math.floor((Math.random()) * 151)];
-    res.json(pokemon);
-})
-
-app.get("/pokemon/:name([A-Za-z]+)", (req, res) => {
-    const name = req.params.name;
-    const pokemon = pokedex.filter((pokemon) => pokemon.name == name);
-    res.json(pokemon);
-});
-
-app.get("/pokemon/:id([0-9]{1,3})", (req, res) => {
-    const id = req.params.id;
-    res.json(pokedex[id - 1]);
-});
-
-app.use((req, res) => {
-    res.status(404);
-    res.json({ "404": "No existe la página" });
-});
+app.use("/pokemon", pokemon);
+app.use(notFoundHandler);
 
 app.listen(3000, () => {
     console.log("Server is running...");
 });
+
+//const db = require('./config/database');
+// app.get("/test", (req, res) => {
+//     db.query("SELECT * FROM pokemon").then((rows)=>{
+//         res.status(200);
+//         res.send(rows);
+//     }).catch((err) => {
+//         res.status(500);
+//         res.send('Algo salió mal');
+//         console.log(err);
+//     });
+// });

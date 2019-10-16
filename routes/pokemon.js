@@ -28,6 +28,31 @@ pokemon.post("/", (req, res) => {
     });
 });
 
+pokemon.delete("/:id([0-9]{1,3})", (req, res) => {
+    query = `DELETE FROM pokemon WHERE pok_id=${req.params.id}`;
+    db.query(query).then(rows => {
+        res.status(200);
+        res.send("Pokemon eliminado correctamente");
+    }).catch(err => {
+        console.log(err);
+        res.status(500);
+        res.send("Ocurrió algo mal");
+    });
+});
+
+pokemon.put("/:id([0-9]{1,3})", (req, res) => {
+    const columns = Object.keys(req.body);
+    const values = Object.values(req.body);
+    query = "UPDATE pokemon SET ";
+    for(let i = 0; i < columns.length; i++){
+        query += `${columns[i]} = `;
+        query += isNaN(values[i]) ? `'${values[i]}'` : `${values[i]}`;
+        query += (i + 1 < columns.length) ?  ", " : " ";
+    }
+    query += `WHERE pok_id = ${req.params.id};`;
+    res.send(query);
+});
+
 pokemon.get("/\\brandom\\b", (req, res) => {
     const id = Math.floor((Math.random()) * 722);
     const query = `SELECT * FROM pokemon WHERE pok_id=${id}`;
